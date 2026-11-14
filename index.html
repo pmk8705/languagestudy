@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>LanguageStudy</title>
+  <meta name="description" content="4개 국어 회화·청크 학습">
+  <meta name="theme-color" content="#5b5bd6">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="LanguageStudy">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <h1 id="title">LanguageStudy</h1>
+    <div id="langBar" class="lang-bar" role="tablist" aria-label="언어 고르기"></div>
+  </header>
+
+  <main id="view"></main>
+
+  <nav class="tabs" aria-label="화면">
+    <button data-tab="study"><span>🃏</span>공부</button>
+    <button data-tab="compare"><span>🗺️</span>비교</button>
+    <button data-tab="inbox"><span>📥</span>수집함</button>
+    <button data-tab="settings"><span>⚙️</span>설정</button>
+  </nav>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <input type="file" id="filePicker" accept=".json,application/json,text/plain" hidden>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+{
+  "id": "daily_gym",
+  "title": "일상/운동",
+  "emoji": "🏋️",
+  "items": [
+    {
+      "id": "gym-01",
+      "ko": "오늘 운동 끝나고 뭐 먹을까?",
+      "en": {
+        "text": "What should we eat after working out today?",
+        "chunks": [
+          { "t": "What should we eat", "ko": "우리 뭐 먹을까? (제안할 때)" },
+          { "t": "after working out", "ko": "운동 끝난 후에" }
+        ]
+      },
+      "ja": {
+        "text": "今日筋トレ終わったら何食べる？",
+        "read": "쿄- 킨토레 오왓타라 나니 타베루?",
+        "chunks": [
+          { "t": "筋トレ終わったら", "read": "킨토레 오왓타라", "ko": "헬스(근력운동) 끝나면" },
+          { "t": "何食べる？", "read": "나니 타베루?", "ko": "뭐 먹을래? (친한 사이)" }
+        ]
+      },
+      "zh": {
+        "text": "今天健身完吃什么？",
+        "pinyin": "jīn tiān jiàn shēn wán chī shén me?",
+        "chunks": [
+          { "t": "健身完", "pinyin": "jiàn shēn wán", "ko": "운동 다 하고 나서" },
+          { "t": "吃什么？", "pinyin": "chī shén me?", "ko": "뭐 먹을까?" }
+        ]
+      },
+      "es": {
+        "text": "¿Qué comemos hoy después de entrenar?",
+        "read": "께 꼬*메*모스 오이 데스*뿌에스* 데 엔뜨레*나르*?",
+        "chunks": [
+          { "t": "¿Qué comemos", "read": "께 꼬*메*모스", "ko": "우리 뭐 먹을까?" },
+          { "t": "después de entrenar", "read": "데스*뿌에스* 데 엔뜨레*나르*", "ko": "운동하고 나서" }
+        ]
+      }
+    },
+    {
+      "id": "gym-02",
+      "ko": "저기요, 몇 세트 남았어요?",
+      "en": {
+        "text": "Excuse me, how many sets do you have left?",
+        "chunks": [
+          { "t": "how many sets", "ko": "몇 세트나" },
+          { "t": "do you have left", "ko": "남으셨나요? (기구 기다릴 때)" }
+        ]
+      },
+      "ja": {
+        "text": "すみません、あと何セットですか？",
+        "read": "스미마셍, 아토 난셋토 데스카?",
+        "chunks": [
+          { "t": "すみません", "read": "스미마셍", "ko": "저기요 (말 걸 때)" },
+          { "t": "あと何セット", "read": "아토 난셋토", "ko": "앞으로 몇 세트" }
+        ]
+      },
+      "zh": {
+        "text": "你好，还有几组？",
+        "pinyin": "nǐ hǎo, hái yǒu jǐ zǔ?",
+        "chunks": [
+          { "t": "还有", "pinyin": "hái yǒu", "ko": "아직 ~가 남아 있다" },
+          { "t": "几组？", "pinyin": "jǐ zǔ?", "ko": "몇 세트? (운동 세트 단위)" }
+        ]
+      },
+      "es": {
+        "text": "Perdona, ¿cuántas series te quedan?",
+        "read": "뻬르*도*나, *꽌*따스 *세*리에스 떼 *께*단?",
+        "chunks": [
+          { "t": "cuántas series", "read": "*꽌*따스 *세*리에스", "ko": "몇 세트" },
+          { "t": "te quedan", "read": "떼 *께*단", "ko": "(너에게) 남아 있다" }
+        ]
+      }
+    },
+    {
+      "id": "gym-03",
+      "ko": "어제 하체 운동을 너무 빡세게 해서 다리가 후들거려.",
+      "en": {
+        "text": "I hit legs so hard yesterday that my legs are shaking.",
+        "chunks": [
+          { "t": "hit legs so hard", "ko": "하체 운동을 엄청 빡세게 하다" },
+          { "t": "my legs are shaking", "ko": "다리가 후들거리다" }
+        ]
+      },
+      "ja": {
+        "text": "昨日脚トレやりすぎて、足がガクガクする。",
+        "read": "키노- 아시토레 야리스기테, 아시가 가쿠가쿠스루.",
+        "chunks": [
+          { "t": "脚トレやりすぎて", "read": "아시토레 야리스기테", "ko": "하체 운동을 너무 과하게 해서" },
+          { "t": "足がガクガクする", "read": "아시가 가쿠가쿠스루", "ko": "다리가 후들후들 떨리다" }
+        ]
+      },
+      "zh": {
+        "text": "昨天练腿太狠了，现在腿直发抖。",
+        "pinyin": "zuó tiān liàn tuǐ tài hěn le, xiàn zài tuǐ zhí fā dǒu.",
+        "chunks": [
+          { "t": "练腿太狠了", "pinyin": "liàn tuǐ tài hěn le", "ko": "하체 운동을 너무 독하게 했다" },
+          { "t": "腿直发抖", "pinyin": "tuǐ zhí fā dǒu", "ko": "다리가 계속 떨린다" }
+        ]
+      },
+      "es": {
+        "text": "Ayer entrené pierna tan duro que me tiemblan las piernas.",
+        "read": "아*예르* 엔뜨레*네* *삐에르*나 딴 *두*로 께 메 *띠엠*블란 라스 *삐에르*나스.",
+        "chunks": [
+          { "t": "entrené pierna tan duro", "read": "엔뜨레*네* *삐에르*나 딴 *두*로", "ko": "하체를 너무 강하게 운동했다" },
+          { "t": "me tiemblan las piernas", "read": "메 *띠엠*블란 라스 *삐에르*나스", "ko": "내 다리가 떨린다" }
+        ]
+      }
+    }
+  ]
+}

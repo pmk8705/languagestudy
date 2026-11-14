@@ -1,0 +1,112 @@
+{
+  "id": "travel",
+  "title": "해외여행",
+  "emoji": "✈️",
+  "items": [
+    {
+      "id": "travel-01",
+      "ko": "여기서 제일 잘 나가는 타파스 두 개만 추천해 주세요.",
+      "en": {
+        "text": "Could you recommend two of your most popular tapas?",
+        "chunks": [
+          { "t": "Could you recommend", "ko": "~을 추천해 주시겠어요?" },
+          { "t": "most popular tapas", "ko": "가장 인기 있는 타파스" }
+        ]
+      },
+      "ja": {
+        "text": "一番人気のタパスを二つ教えてもらえますか？",
+        "read": "이치방 닌키노 타파스오 후타츠 오시에테 모라에마스카?",
+        "chunks": [
+          { "t": "一番人気の", "read": "이치방 닌키노", "ko": "제일 인기 있는" },
+          { "t": "教えてもらえますか？", "read": "오시에테 모라에마스카?", "ko": "알려 주실 수 있나요?" }
+        ]
+      },
+      "zh": {
+        "text": "请推荐两道这里最受欢迎的小吃。",
+        "pinyin": "qǐng tuī jiàn liǎng dào zhè lǐ zuì shòu huān yíng de xiǎo chī.",
+        "chunks": [
+          { "t": "请推荐", "pinyin": "qǐng tuī jiàn", "ko": "추천해 주세요" },
+          { "t": "最受欢迎的", "pinyin": "zuì shòu huān yíng de", "ko": "가장 인기 있는" }
+        ]
+      },
+      "es": {
+        "text": "¿Nos recomienda dos de sus tapas más populares, por favor?",
+        "read": "노스 레꼬*미엔*다 도스 데 수스 *따*빠스 마스 뽀뿌*라*레스, 뽀르 파*보르*?",
+        "chunks": [
+          { "t": "¿Nos recomienda", "read": "노스 레꼬*미엔*다", "ko": "저희에게 추천해 주시겠어요?" },
+          { "t": "más populares", "read": "마스 뽀뿌*라*레스", "ko": "가장 인기 있는" }
+        ]
+      }
+    },
+    {
+      "id": "travel-02",
+      "ko": "체크인 시간보다 일찍 도착했는데, 짐 먼저 맡길 수 있을까요?",
+      "en": {
+        "text": "We arrived before check-in time. Could we leave our luggage first?",
+        "chunks": [
+          { "t": "before check-in time", "ko": "체크인 시간 전에" },
+          { "t": "leave our luggage", "ko": "짐을 맡기다" }
+        ]
+      },
+      "ja": {
+        "text": "チェックインより早く着いたんですが、先に荷物を預けられますか？",
+        "read": "쳇쿠인요리 하야쿠 츠이탄데스가, 사키니 니모츠오 아즈케라레마스카?",
+        "chunks": [
+          { "t": "先に荷物を", "read": "사키니 니모츠오", "ko": "먼저 짐을" },
+          { "t": "預けられますか？", "read": "아즈케라레마스카?", "ko": "맡길 수 있을까요?" }
+        ]
+      },
+      "zh": {
+        "text": "我们比入住时间早到了，可以先寄存行李吗？",
+        "pinyin": "wǒ men bǐ rù zhù shí jiān zǎo dào le, kě yǐ xiān jì cún xíng li ma?",
+        "chunks": [
+          { "t": "比入住时间早到", "pinyin": "bǐ rù zhù shí jiān zǎo dào", "ko": "체크인 시간보다 일찍 도착하다" },
+          { "t": "先寄存行李", "pinyin": "xiān jì cún xíng li", "ko": "먼저 짐을 보관하다" }
+        ]
+      },
+      "es": {
+        "text": "Llegamos antes del check-in, ¿podemos dejar las maletas primero?",
+        "read": "예*가*모스 *안*떼스 델 체크*인*, 뽀*데*모스 데*하르* 라스 마*레*따스 쁘리*메*로?",
+        "chunks": [
+          { "t": "antes del check-in", "read": "*안*떼스 델 체크*인*", "ko": "체크인 시간 전에" },
+          { "t": "dejar las maletas", "read": "데*하르* 라스 마*레*따스", "ko": "캐리어(짐)를 맡기다" }
+        ]
+      }
+    },
+    {
+      "id": "travel-03",
+      "ko": "계산서 좀 갖다주시겠어요? 카드로 계산할게요.",
+      "en": {
+        "text": "Could we get the check, please? I'll pay by card.",
+        "chunks": [
+          { "t": "get the check", "ko": "계산서를 받다" },
+          { "t": "pay by card", "ko": "카드로 결제하다" }
+        ]
+      },
+      "ja": {
+        "text": "お会計お願いします。カードで払います。",
+        "read": "오카이케- 오네가이시마스. 카-도데 하라이마스.",
+        "chunks": [
+          { "t": "お会計お願いします", "read": "오카이케- 오네가이시마스", "ko": "계산 부탁드립니다" },
+          { "t": "カードで払います", "read": "카-도데 하라이마스", "ko": "카드로 낼게요" }
+        ]
+      },
+      "zh": {
+        "text": "麻烦买单，我刷卡。",
+        "pinyin": "má fan mǎi dān, wǒ shuā kǎ.",
+        "chunks": [
+          { "t": "麻烦买单", "pinyin": "má fan mǎi dān", "ko": "실례지만 계산할게요" },
+          { "t": "我刷卡", "pinyin": "wǒ shuā kǎ", "ko": "카드로 긁을게요(결제할게요)" }
+        ]
+      },
+      "es": {
+        "text": "¿Nos trae la cuenta, por favor? Pago con tarjeta.",
+        "read": "노스 *뜨라*에 라 *꾸엔*따, 뽀르 파*보르*? *빠*고 꼰 따르*헤*따.",
+        "chunks": [
+          { "t": "¿Nos trae la cuenta", "read": "노스 *뜨라*에 라 *꾸엔*따", "ko": "계산서 좀 가져다주시겠어요?" },
+          { "t": "Pago con tarjeta", "read": "*빠*고 꼰 따르*헤*따", "ko": "카드로 계산합니다" }
+        ]
+      }
+    }
+  ]
+}
