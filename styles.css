@@ -205,6 +205,15 @@ textarea {
 .check-list .bad { color: var(--again); }
 .check-list .warn { color: var(--hard); }
 
+.fold {
+  width: 100%; min-height: 52px; margin: 16px 0 10px; padding: 0 16px;
+  display: flex; justify-content: space-between; align-items: center;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--card);
+  font-weight: 700; font-size: 16px;
+}
+.fold span:last-child { color: var(--accent); font-size: 14px; }
+.group-title { font-weight: 700; margin-bottom: 4px; }
+
 /* 설정 */
 .voice-row { display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid var(--line); font-size: 15px; }
 .voice-row:first-child { border-top: 0; }

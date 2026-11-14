@@ -13,6 +13,31 @@ const LANGS = {
 // 복습 칸(box)마다 다음 복습까지 날 수
 const BOX_DAYS = [0, 1, 3, 7, 14, 30, 60, 120];
 const MINE = { id: "mine", title: "내 문장", emoji: "✍️" };
+// 내 문장 주제: Gemini는 이 목록에서만 고른다 (docs/문장규칙.md와 같게)
+const THEMES = ["인사·예절", "식당·카페", "쇼핑·결제", "호텔", "교통", "길찾기", "관광·사진", "긴급·건강", "일상", "운동", "감정·대화", "기타"];
+// 목록에 없는 이름은 낱말로 가장 가까운 주제에 합침 (위에서부터 먼저 맞는 것)
+const THEME_WORDS = [
+  ["식당·카페", ["식당", "카페", "음식", "주문", "레스토랑", "타파스", "맛집", "음료", "술", "메뉴"]],
+  ["쇼핑·결제", ["쇼핑", "결제", "계산", "가격", "시장", "환전", "돈", "구매"]],
+  ["호텔", ["호텔", "숙소", "숙박", "체크인", "체크아웃"]],
+  ["교통", ["교통", "공항", "기차", "버스", "택시", "지하철", "비행", "렌터카", "이동"]],
+  ["길찾기", ["길", "위치", "방향"]],
+  ["관광·사진", ["관광", "사진", "박물관", "투어", "입장", "구경", "명소"]],
+  ["긴급·건강", ["긴급", "건강", "병원", "약국", "아파", "분실", "경찰", "응급", "알레르기"]],
+  ["인사·예절", ["인사", "예절", "감사", "사과", "소개", "실례"]],
+  ["운동", ["운동", "헬스", "스포츠", "체육", "요가", "러닝"]],
+  ["일상", ["일상", "생활", "날씨", "집", "회사", "업무"]],
+  ["감정·대화", ["감정", "대화", "기분", "잡담", "수다"]],
+];
+function normTheme(name) {
+  const s = String(name || "").trim();
+  if (!s) return "기타";
+  const flat = s.replace(/[\s/·,.]/g, "");
+  const exact = THEMES.find(t => t.replace(/·/g, "") === flat);
+  if (exact) return exact;
+  for (const [t, words] of THEME_WORDS) if (words.some(w => s.includes(w))) return t;
+  return "기타";
+}
 
 const $ = (s, el = document) => el.querySelector(s);
 const view = $("#view");
@@ -35,7 +60,7 @@ function load() {
       return {
         settings: Object.assign(d.settings, s.settings || {}),
         progress: s.progress || {},
-        mine: Array.isArray(s.mine) ? s.mine : [],
+        mine: (Array.isArray(s.mine) ? s.mine : []).map(it => Object.assign({}, it, { theme: normTheme(it.theme) })),
         inbox: Array.isArray(s.inbox) ? s.inbox : [],
         newLog: Object.assign(d.newLog, s.newLog || {}),
       };
@@ -334,6 +359,7 @@ function grade(g) {
 let tab = "study";
 let cmpQuery = "", cmpLimit = 30;
 let pending = null; // 검사한 가져오기 결과
+let mineOpen = false, mineQuery = "";
 let timerHandle;
 
 function render() {
@@ -445,7 +471,7 @@ const GEMINI_RULES = `아래 한국어 문장들을 LanguageStudy 앱 형식의 
 [
   {
     "id": "my-YYMMDD-01",
-    "theme": "짧은 주제 (예: 일상/운동, 식당, 호텔)",
+    "theme": "아래 주제 목록 중 하나",
     "ko": "한국어 문장",
     "en": { "text": "...", "chunks": [{ "t": "...", "ko": "..." }] },
     "ja": { "text": "...", "read": "한글 발음", "chunks": [{ "t": "...", "read": "...", "ko": "..." }] },
@@ -456,6 +482,7 @@ const GEMINI_RULES = `아래 한국어 문장들을 LanguageStudy 앱 형식의 
 
 [규칙]
 - id: "my-" + 오늘 날짜(YYMMDD) + "-" + 두 자리 번호. 한 번 정한 id는 바꾸지 않음.
+- theme: 다음 12개 중 하나를 글자 그대로 (새 이름 만들지 말 것): ${THEMES.join(" / ")}
 - 교과서체가 아닌 원어민이 실제로 쓰는 자연스러운 구어체. 친구 사이는 반말 톤, 가게·호텔은 정중한 톤.
 - chunks: 언어마다 2~3개, 통째로 외울 2~4단어 덩어리. "ko"는 쓰임새가 보이는 풀이.
 - 일본어 read: 한글 발음. 장음은 "-" (예: 쿄-), 촉음(っ)은 받침 ㅅ 또는 다음 자음 겹침.
@@ -509,7 +536,7 @@ function checkImport(raw) {
     if (seen.has(id)) { errors.push(`${n}: id "${id}"가 이번 묶음 안에서 겹쳐요.`); return; }
     if (builtIn.has(id)) { errors.push(`${n}: id "${id}"가 기본 문장과 겹쳐요.`); return; }
     seen.add(id);
-    const clean = { id, ko, theme: str(it.theme) || "내 문장" };
+    const clean = { id, ko, theme: normTheme(it.theme) };
     let langs = 0;
     for (const l of LANG_ORDER) {
       const d = it[l];
@@ -579,7 +606,7 @@ function renderInbox() {
     html += `<div style="margin-top:12px"><b>${items.length}개 문장을 저장할 수 있어요.</b>`;
     if (errors.length || warns.length) html += `<ul class="check-list">${errors.map(e => `<li class="bad">❌ ${esc(e)}</li>`).join("")}${warns.map(w => `<li class="warn">⚠️ ${esc(w)}</li>`).join("")}</ul>`;
     if (items.length) {
-      html += `<ul class="check-list">${items.map(it => `<li>${esc(it.ko)} <span class="muted">${LANG_ORDER.filter(l => it[l]).map(l => LANGS[l].flag).join("")}</span></li>`).join("")}</ul>
+      html += `<ul class="check-list">${items.map(it => `<li>${esc(it.ko)} <span class="muted">· ${esc(it.theme)} ${LANG_ORDER.filter(l => it[l]).map(l => LANGS[l].flag).join("")}</span></li>`).join("")}</ul>
         <button class="btn primary wide" data-act="save-import">저장하기</button>`;
     }
     html += `</div>`;
@@ -587,8 +614,20 @@ function renderInbox() {
   html += `</div>`;
 
   if (state.mine.length) {
-    html += `<h2>✍️ 내 문장 (${state.mine.length})</h2><div class="card">${state.mine.map(it =>
-      `<div class="inbox-item"><span>${esc(it.ko)}</span><button class="x" data-act="mine-del" data-id="${esc(it.id)}" aria-label="지우기">✕</button></div>`).join("")}</div>`;
+    html += `<button class="fold" data-act="mine-toggle" aria-expanded="${mineOpen}">
+      <span>✍️ 내 문장 ${state.mine.length}개</span><span>${mineOpen ? "▾ 접기" : "▸ 펼치기"}</span></button>`;
+    if (mineOpen) {
+      const q = mineQuery.trim().toLowerCase();
+      const list = state.mine.filter(it => !q || JSON.stringify(it).toLowerCase().includes(q));
+      html += `<input class="search" id="mineSearch" type="search" placeholder="내 문장에서 찾기" value="${esc(mineQuery)}">`;
+      if (!list.length) html += `<div class="empty"><b>🔍</b>찾는 문장이 없어요.</div>`;
+      for (const t of THEMES) {
+        const g = list.filter(it => normTheme(it.theme) === t);
+        if (!g.length) continue;
+        html += `<div class="card"><div class="group-title">${esc(t)} <span class="muted">${g.length}</span></div>${g.map(it =>
+          `<div class="inbox-item"><span>${esc(it.ko)}</span><button class="x" data-act="mine-del" data-id="${esc(it.id)}" aria-label="지우기">✕</button></div>`).join("")}</div>`;
+      }
+    }
   }
   view.innerHTML = html;
 }
@@ -643,7 +682,8 @@ $("#filePicker").addEventListener("change", async e => {
     const base = defaults();
     state = {
       settings: Object.assign(base.settings, d.settings || {}),
-      progress: d.progress || {}, mine: d.mine || [], inbox: d.inbox || [], newLog: base.newLog,
+      progress: d.progress || {}, inbox: d.inbox || [], newLog: base.newLog,
+      mine: (d.mine || []).map(it => Object.assign({}, it, { theme: normTheme(it.theme) })),
     };
     session = null;
     save();
@@ -679,6 +719,7 @@ view.addEventListener("click", async e => {
     return;
   }
   if (act === "save-import") return saveImport();
+  if (act === "mine-toggle") { mineOpen = !mineOpen; render(); return; }
   if (act === "mine-del") {
     const it = state.mine.find(m => m.id === b.dataset.id);
     if (!it || !confirm(`"${it.ko}" 문장을 지울까요?`)) return;
@@ -707,11 +748,12 @@ view.addEventListener("submit", e => {
   if (again) again.focus();
 });
 view.addEventListener("input", e => {
-  if (e.target.id === "cmpSearch") {
-    cmpQuery = e.target.value; cmpLimit = 30;
+  const id = e.target.id;
+  if (id === "cmpSearch" || id === "mineSearch") {
+    if (id === "cmpSearch") { cmpQuery = e.target.value; cmpLimit = 30; } else mineQuery = e.target.value;
     const pos = e.target.selectionStart;
     render();
-    const s = $("#cmpSearch"); if (s) { s.focus(); try { s.setSelectionRange(pos, pos); } catch (err) { /* type=search */ } }
+    const s = $("#" + id); if (s) { s.focus(); try { s.setSelectionRange(pos, pos); } catch (err) { /* type=search */ } }
   }
 });
 view.addEventListener("change", e => {
