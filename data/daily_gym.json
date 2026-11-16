@@ -5,6 +5,7 @@
   "items": [
     {
       "id": "gym-01",
+      "theme": "운동",
       "ko": "오늘 운동 끝나고 뭐 먹을까?",
       "en": {
         "text": "What should we eat after working out today?",
@@ -40,6 +41,7 @@
     },
     {
       "id": "gym-02",
+      "theme": "운동",
       "ko": "저기요, 몇 세트 남았어요?",
       "en": {
         "text": "Excuse me, how many sets do you have left?",
@@ -75,6 +77,7 @@
     },
     {
       "id": "gym-03",
+      "theme": "운동",
       "ko": "어제 하체 운동을 너무 빡세게 해서 다리가 후들거려.",
       "en": {
         "text": "I hit legs so hard yesterday that my legs are shaking.",

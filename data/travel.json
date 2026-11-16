@@ -5,6 +5,7 @@
   "items": [
     {
       "id": "travel-01",
+      "theme": "식당·카페",
       "ko": "여기서 제일 잘 나가는 타파스 두 개만 추천해 주세요.",
       "en": {
         "text": "Could you recommend two of your most popular tapas?",
@@ -40,6 +41,7 @@
     },
     {
       "id": "travel-02",
+      "theme": "호텔",
       "ko": "체크인 시간보다 일찍 도착했는데, 짐 먼저 맡길 수 있을까요?",
       "en": {
         "text": "We arrived before check-in time. Could we leave our luggage first?",
@@ -75,6 +77,7 @@
     },
     {
       "id": "travel-03",
+      "theme": "식당·카페",
       "ko": "계산서 좀 갖다주시겠어요? 카드로 계산할게요.",
       "en": {
         "text": "Could we get the check, please? I'll pay by card.",

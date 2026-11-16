@@ -29,6 +29,10 @@ const THEME_WORDS = [
   ["일상", ["일상", "생활", "날씨", "집", "회사", "업무"]],
   ["감정·대화", ["감정", "대화", "기분", "잡담", "수다"]],
 ];
+const THEME_EMOJI = {
+  "인사·예절": "👋", "식당·카페": "🍽️", "쇼핑·결제": "🛍️", "호텔": "🏨", "교통": "🚆", "길찾기": "🧭",
+  "관광·사진": "📸", "긴급·건강": "🚑", "일상": "🏠", "운동": "🏋️", "감정·대화": "💬", "기타": "📦",
+};
 function normTheme(name) {
   const s = String(name || "").trim();
   if (!s) return "기타";
@@ -45,7 +49,7 @@ const view = $("#view");
 /* ---------- 저장 ---------- */
 function defaults() {
   return {
-    settings: { lang: "en", rate: 1, autoPlay: true, newPerDay: 10, deck: "all" },
+    settings: { lang: "en", rate: 1, autoPlay: true, newPerDay: 10, topic: "all" },
     progress: {},          // "문장id:언어" → { box, due, last, reps }
     mine: [],              // 내가 가져온 문장
     inbox: [],             // 한국어로 모아 둔 문장 [{ id, ko, at }]
@@ -121,7 +125,7 @@ function deckList() {
 }
 function allItems() {
   const out = [];
-  for (const d of deckList()) for (const it of d.items) out.push(Object.assign({ deck: d.id, deckTitle: d.title, deckEmoji: d.emoji }, it));
+  for (const d of deckList()) for (const it of d.items) out.push(Object.assign({ deck: d.id }, it, { theme: normTheme(it.theme || d.title) }));
   return out;
 }
 function itemById(id) { return allItems().find(it => it.id === id); }
@@ -313,7 +317,8 @@ function newAllowance(lang) {
   rollNewLog();
   return Math.max(0, state.settings.newPerDay + (state.newLog.extra[lang] || 0) - (state.newLog.done[lang] || 0));
 }
-function deckFilter(it) { return state.settings.deck === "all" || it.deck === state.settings.deck; }
+function deckFilter(it) { return state.settings.topic === "all" || it.theme === state.settings.topic; }
+function themeLabel(it) { return `${THEME_EMOJI[it.theme] || "📦"} ${esc(it.theme)}${it.deck === "mine" ? " · ✍️" : ""}`; }
 
 let session = null;
 function buildSession() {
@@ -328,7 +333,7 @@ function buildSession() {
   due.sort((a, b) => a[0] < b[0] ? -1 : 1);
   const newIds = fresh.slice(0, newAllowance(lang));
   session = {
-    lang, deck: state.settings.deck, date: t,
+    lang, topic: state.settings.topic, date: t,
     queue: due.map(x => x[1]).concat(newIds),
     newIds: new Set(newIds),
     idx: 0, flipped: false,
@@ -337,7 +342,7 @@ function buildSession() {
   };
 }
 function needSession() {
-  return !session || session.lang !== state.settings.lang || session.deck !== state.settings.deck || session.date !== todayStr();
+  return !session || session.lang !== state.settings.lang || session.topic !== state.settings.topic || session.date !== todayStr();
 }
 function grade(g) {
   const s = session, id = s.queue[s.idx], lang = s.lang;
@@ -378,13 +383,17 @@ function renderLangBar() {
   bar.innerHTML = LANG_ORDER.map(l =>
     `<button role="tab" data-lang="${l}" aria-selected="${state.settings.lang === l}">${LANGS[l].flag} ${LANGS[l].name}</button>`).join("");
 }
-function deckChips() {
-  const list = deckList();
-  if (state.settings.deck !== "all" && !list.some(d => d.id === state.settings.deck)) state.settings.deck = "all";
-  return `<div class="chips">` +
-    `<button data-act="deck" data-id="all" class="${state.settings.deck === "all" ? "on" : ""}">전체</button>` +
-    list.map(d => `<button data-act="deck" data-id="${esc(d.id)}" class="${state.settings.deck === d.id ? "on" : ""}">${d.emoji} ${esc(d.title)}</button>`).join("") +
-    `</div>`;
+// 주제 칩: 이 언어로 볼 수 있는 문장이 있는 주제만, 개수와 함께
+function deckChips(lang) {
+  const items = allItems().filter(it => !lang || hasLang(it, lang));
+  const counts = {};
+  for (const it of items) counts[it.theme] = (counts[it.theme] || 0) + 1;
+  const topic = state.settings.topic;
+  if (topic !== "all" && !counts[topic]) state.settings.topic = "all";
+  const chip = (id, label, n) =>
+    `<button data-act="deck" data-id="${esc(id)}" class="${state.settings.topic === id ? "on" : ""}">${label} <span class="n">${n}</span></button>`;
+  return `<div class="chips">` + chip("all", "전체", items.length) +
+    THEMES.filter(t => counts[t]).map(t => chip(t, `${THEME_EMOJI[t]} ${esc(t)}`, counts[t])).join("") + `</div>`;
 }
 
 function renderStudy() {
@@ -393,7 +402,7 @@ function renderStudy() {
   let id = s.queue[s.idx], it = id && itemById(id);
   while (id && !hasLang(it, lang)) { s.idx++; id = s.queue[s.idx]; it = id && itemById(id); } // 지워진 문장 건너뛰기
   const left = s.queue.length - s.idx;
-  let html = deckChips() + `<div class="study-head"><span class="muted">${L.flag} ${L.name} · 남은 카드 ${left}</span><span class="muted small">복습 ${s.dueCount} · 새 ${s.newIds.size}</span></div>`;
+  let html = deckChips(lang) + `<div class="study-head"><span class="muted">${L.flag} ${L.name} · 남은 카드 ${left}</span><span class="muted small">복습 ${s.dueCount} · 새 ${s.newIds.size}</span></div>`;
 
   if (!it) {
     html += doneHtml();
@@ -404,7 +413,7 @@ function renderStudy() {
   const p = state.progress[pkey(it.id, lang)];
   const box = p ? p.box : 0;
   html += `<div class="card flash" ${s.flipped ? "" : `data-act="flip"`}>
-    <div class="theme">${it.deckEmoji} ${esc(it.theme || it.deckTitle)}${s.newIds.has(it.id) && !p ? " · 새 문장" : ""}</div>
+    <div class="theme">${themeLabel(it)}${s.newIds.has(it.id) && !p ? " · 새 문장" : ""}</div>
     <div class="ko">${esc(it.ko)}</div>`;
   if (!s.flipped) {
     html += `<div class="timer run"><i></i></div><div class="tap-hint" id="hint">3초 안에 ${L.name}로 말해 보세요</div>`;
@@ -433,7 +442,7 @@ function doneHtml() {
   const n = s.stats.again + s.stats.hard + s.stats.good;
   const items = allItems().filter(it => deckFilter(it) && hasLang(it, lang));
   if (!items.length) {
-    return `<div class="empty"><b>📭</b>이 묶음에는 ${LANGS[lang].name} 문장이 없어요.</div>`;
+    return `<div class="empty"><b>📭</b>이 주제에는 ${LANGS[lang].name} 문장이 없어요.</div>`;
   }
   let next = null;
   for (const it of items) {
@@ -453,7 +462,7 @@ function renderCompare() {
   const items = allItems().filter(it => deckFilter(it) && (!q || JSON.stringify(it).toLowerCase().includes(q)));
   let html = deckChips() + `<input class="search" id="cmpSearch" type="search" placeholder="한국어·외국어로 찾기" value="${esc(cmpQuery)}">`;
   if (!items.length) html += `<div class="empty"><b>🔍</b>찾는 문장이 없어요.</div>`;
-  html += items.slice(0, cmpLimit).map(it => `<div class="card cmp"><div class="theme muted small">${it.deckEmoji} ${esc(it.theme || it.deckTitle)}</div>
+  html += items.slice(0, cmpLimit).map(it => `<div class="card cmp"><div class="theme muted small">${themeLabel(it)}</div>
     <div class="ko">${esc(it.ko)}</div>` +
     LANG_ORDER.filter(l => hasLang(it, l)).map(l => `<div class="cmp-lang"><div class="flag">${LANGS[l].flag}</div>
       <div class="body">${sentenceHtml(l, it[l], { mark: false, legend: false })}</div>
@@ -525,6 +534,8 @@ function checkImport(raw) {
 
   const builtIn = new Set(decks.flatMap(d => d.items.map(it => it.id)));
   const mineIds = new Set(state.mine.map(it => it.id));
+  const builtInKo = new Set(decks.flatMap(d => d.items.map(it => koKey(it.ko))));
+  const dups = {};
   const seen = new Set();
   const items = [];
   data.forEach((it, i) => {
@@ -565,18 +576,29 @@ function checkImport(raw) {
     }
     if (!langs) { errors.push(`${n}: 외국어 문장(text)이 하나도 없어요.`); return; }
     if (mineIds.has(id)) warns.push(`${n}: 같은 id의 내 문장을 새 내용으로 바꿔요 (복습 기록은 유지).`);
+    else {
+      // id는 다른데 한국어가 같은 문장 → 고친 문장인지 사용자가 고름 (기본: 바꾸기)
+      const k = koKey(ko);
+      const old = state.mine.find(m => koKey(m.ko) === k);
+      if (old) dups[items.length] = { of: old.id, mode: "replace" };
+      else if (builtInKo.has(k)) warns.push(`${n}: 기본 문장에 같은 한국어 문장이 있어요 (따로 추가돼요).`);
+    }
     items.push(clean);
   });
-  return { items, errors, warns };
+  return { items, errors, warns, dups };
 }
+function koKey(s) { return String(s || "").replace(/[\s.,!?！？。、~…·'"“”‘’]/g, ""); }
 function saveImport() {
   if (!pending || !pending.items.length) return;
   const kos = new Set();
-  for (const it of pending.items) {
+  let replaced = 0;
+  pending.items.forEach((it, idx) => {
+    const d = pending.dups && pending.dups[idx];
+    if (d && d.mode === "replace") { it.id = d.of; replaced++; } // 예전 id를 이어받아 복습 기록 유지
     const i = state.mine.findIndex(m => m.id === it.id);
     if (i >= 0) state.mine[i] = it; else state.mine.push(it);
     kos.add(it.ko.replace(/\s+/g, ""));
-  }
+  });
   const before = state.inbox.length;
   state.inbox = state.inbox.filter(x => !kos.has(x.ko.replace(/\s+/g, "")));
   const removed = before - state.inbox.length;
@@ -584,7 +606,7 @@ function saveImport() {
   pending = null;
   session = null;
   save();
-  toast(`문장 ${n}개를 저장했어요.${removed ? ` 수집함에서 ${removed}개를 지웠어요.` : ""}`);
+  toast(`문장 ${n}개를 저장했어요.${replaced ? ` (그중 ${replaced}개는 예전 문장을 바꿈)` : ""}${removed ? ` 수집함에서 ${removed}개를 지웠어요.` : ""}`);
   render();
 }
 
@@ -606,7 +628,14 @@ function renderInbox() {
     html += `<div style="margin-top:12px"><b>${items.length}개 문장을 저장할 수 있어요.</b>`;
     if (errors.length || warns.length) html += `<ul class="check-list">${errors.map(e => `<li class="bad">❌ ${esc(e)}</li>`).join("")}${warns.map(w => `<li class="warn">⚠️ ${esc(w)}</li>`).join("")}</ul>`;
     if (items.length) {
-      html += `<ul class="check-list">${items.map(it => `<li>${esc(it.ko)} <span class="muted">· ${esc(it.theme)} ${LANG_ORDER.filter(l => it[l]).map(l => LANGS[l].flag).join("")}</span></li>`).join("")}</ul>
+      const dups = pending.dups || {};
+      const nd = Object.keys(dups).length;
+      if (nd) html += `<div class="dup-note">🔁 이미 있는 한국어 문장이 ${nd}개 있어요 (번호만 달라요). 고친 문장이면 '예전 것 바꾸기', 다른 표현으로 하나 더 두려면 '따로 추가'를 고르세요.</div>`;
+      html += `<ul class="check-list">${items.map((it, i) => `<li>${esc(it.ko)} <span class="muted">· ${esc(it.theme)} ${LANG_ORDER.filter(l => it[l]).map(l => LANGS[l].flag).join("")}</span>` +
+        (dups[i] ? `<div class="dup-pick">
+          <label><input type="radio" name="dup-${i}" value="replace" ${dups[i].mode === "replace" ? "checked" : ""}> 예전 것 바꾸기</label>
+          <label><input type="radio" name="dup-${i}" value="add" ${dups[i].mode === "add" ? "checked" : ""}> 따로 추가</label></div>` : "") +
+        `</li>`).join("")}</ul>
         <button class="btn primary wide" data-act="save-import">저장하기</button>`;
     }
     html += `</div>`;
@@ -624,7 +653,7 @@ function renderInbox() {
       for (const t of THEMES) {
         const g = list.filter(it => normTheme(it.theme) === t);
         if (!g.length) continue;
-        html += `<div class="card"><div class="group-title">${esc(t)} <span class="muted">${g.length}</span></div>${g.map(it =>
+        html += `<div class="card"><div class="group-title">${THEME_EMOJI[t]} ${esc(t)} <span class="muted">${g.length}</span></div>${g.map(it =>
           `<div class="inbox-item"><span>${esc(it.ko)}</span><button class="x" data-act="mine-del" data-id="${esc(it.id)}" aria-label="지우기">✕</button></div>`).join("")}</div>`;
       }
     }
@@ -707,7 +736,7 @@ view.addEventListener("click", async e => {
   }
   if (act === "grade") return grade(b.dataset.g);
   if (act === "rate") { state.settings.rate = state.settings.rate < 1 ? 1 : 0.75; save(); render(); return; }
-  if (act === "deck") { state.settings.deck = b.dataset.id; cmpLimit = 30; save(); render(); return; }
+  if (act === "deck") { state.settings.topic = b.dataset.id; cmpLimit = 30; save(); render(); return; }
   if (act === "more-new") { rollNewLog(); const l = state.settings.lang; state.newLog.extra[l] = (state.newLog.extra[l] || 0) + 10; save(); session = null; render(); return; }
   if (act === "cmp-more") { cmpLimit += 30; render(); return; }
   if (act === "inbox-del") { state.inbox.splice(Number(b.dataset.i), 1); save(); render(); return; }
@@ -758,6 +787,10 @@ view.addEventListener("input", e => {
 });
 view.addEventListener("change", e => {
   if (e.target.id === "autoPlay") { state.settings.autoPlay = e.target.checked; save(); }
+  if (e.target.name && e.target.name.startsWith("dup-") && pending && pending.dups) {
+    const d = pending.dups[Number(e.target.name.slice(4))];
+    if (d) d.mode = e.target.value;
+  }
   if (e.target.id === "newPerDay") { state.settings.newPerDay = Number(e.target.value); session = null; save(); }
 });
 $("#langBar").addEventListener("click", e => {
