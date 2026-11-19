@@ -1,6 +1,6 @@
 // 서비스 워커: 네트워크 우선, 안 되면 저장본 → 오프라인에서도 동작
 // 정적 파일(js/css/json/아이콘)을 바꾸면 CACHE 숫자를 올린다. 새 파일은 ASSETS에 추가.
-const CACHE = "languagestudy-v4";
+const CACHE = "languagestudy-v5";
 const ASSETS = [
   "./",
   "index.html",
